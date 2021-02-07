@@ -45,6 +45,31 @@ def ret_all_storage():
 
     return json.dumps(_)
 
+@application.route("/get_cell")
+def get_cell():
+    cell_name = request.args.getlist("cell_name")[0]
+    i = talker.get_cell(cell_name)
+    if i!="Неправильная ячейка":
+        _ = {
+            "name": i.name,
+            "merged": 0 if i.merged else 1,
+            "group_of_merge": str(i.group_of_merge),
+            "merged_with": "" if not i.merged else str(i.merged_with),
+            "size_width": i.size_width,
+            "size_height": i.size_height,
+            "size_depth": i.size_depth,
+            "busy": 0 if i.busy else 1,
+            "contained_item": "" if not i.busy else {
+                "name": i.contained_item.name,
+                "height": i.contained_item.original_height,
+                "width": i.contained_item.original_width,
+                "depth": i.contained_item.original_depth,
+                "mass": i.contained_item.mass,
+                "uuid": i.contained_item.uuid
+        }}
+    else:
+        _ = "Неправильная ячейка"
+    return json.dumps(_)
 
 if __name__ == '__main__':
     application.run()
