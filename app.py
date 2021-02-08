@@ -16,7 +16,7 @@ def hello_world():
 
 @application.route('/get_scheme')
 def ret_csheme():
-    return redirect("http://192.168.0.109:3000/get_storage_scheme")
+    return redirect(talker.adr+"/get_storage_scheme")
 
 
 @application.route('/get_list_of_items_main_json')
@@ -98,6 +98,15 @@ def get_data_from_uuid_json():
         _ = "Неправильный uuid"
 
     return json.dumps(_)
+
+@application.route("/get_item_from_storage_json")
+def get_item_from_storage_json():
+    try:
+        data_about_position = request.args.getlist("id")[0]
+    except:
+        return json.dumps("No argument found")
+    _resp = talker.get(data_about_position)
+    return _resp
 
 if __name__ == '__main__':
     application.run()
