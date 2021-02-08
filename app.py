@@ -17,8 +17,10 @@ def hello_world():
     return "HighLevelAPI made by ПиФла"
 
 
-@application.route('/get_scheme')
-def ret_csheme():
+@application.route('/<token>/get_scheme')
+def ret_scheme(token):
+    if token not in TOKENS:
+        abort(400, "no permission")
     return redirect(talker.adr + "/get_storage_scheme")
 
 
@@ -153,6 +155,8 @@ def handle_with_uploaded(token, filename):
     _resp = talker.put(request.data)
 
     return json.dumps(_resp)
+
+# @application.route("/<token>/pdf_main"):
 
 
 if __name__ == '__main__':
