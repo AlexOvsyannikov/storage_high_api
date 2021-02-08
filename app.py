@@ -111,6 +111,8 @@ def get_item_from_storage_json():
 @application.route("/get_remote_json")
 def get_remote_json():
     _resp = talker.get_remote()
+    if _resp=="Empty":
+        return "Empty"
     _ = []
     for i in _resp:
         _.append({
