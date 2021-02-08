@@ -11,6 +11,11 @@ talker = BackendTalker(port=3000, host="192.168.0.109")
 
 TOKENS = ['123']
 
+def check_token(token):
+    if token in TOKENS:
+        return True
+    else:
+        return False
 
 @application.route('/')
 def hello_world():
@@ -19,13 +24,16 @@ def hello_world():
 
 @application.route('/<token>/get_scheme')
 def ret_scheme(token):
-    if token not in TOKENS:
+    if not check_token(token):
         abort(400, "no permission")
     return redirect(talker.adr + "/get_storage_scheme")
 
 
-@application.route('/get_list_of_items_main_json')
-def ret_all_storage():
+@application.route('/<token>/get_list_of_items_main_json')
+def ret_all_storage(token):
+    if not check_token(token):
+        abort(400, "no permission")
+
     data = talker.get_list_of_all()
     _ = []
     for i in data:
@@ -51,8 +59,11 @@ def ret_all_storage():
     return json.dumps(_)
 
 
-@application.route("/get_cell_json")
-def get_cell():
+@application.route("/<token>/get_cell_json")
+def get_cell(token):
+    if not check_token(token):
+        abort(400, "no permission")
+
     cell_name = request.args.getlist("cell_name")[0]
     i = talker.get_cell(cell_name)
     if i != "Неправильная ячейка":
@@ -78,8 +89,11 @@ def get_cell():
     return json.dumps(_)
 
 
-@application.route("/get_data_from_uuid_json")
-def get_data_from_uuid_json():
+@application.route("/<token>/get_data_from_uuid_json")
+def get_data_from_uuid_json(token):
+    if not check_token(token):
+        abort(400, "no permission")
+
     uuid = request.args.getlist("uuid")[0]
 
     i = talker.get_data_to_search_by_item(uuid)
@@ -107,8 +121,11 @@ def get_data_from_uuid_json():
     return json.dumps(_)
 
 
-@application.route("/get_item_from_storage_json")
-def get_item_from_storage_json():
+@application.route("/<token>/get_item_from_storage_json")
+def get_item_from_storage_json(token):
+    if not check_token(token):
+        abort(400, "no permission")
+
     try:
         data_about_position = request.args.getlist("id")[0]
     except:
@@ -117,8 +134,11 @@ def get_item_from_storage_json():
     return _resp
 
 
-@application.route("/get_remote_json")
-def get_remote_json():
+@application.route("/<token>/get_remote_json")
+def get_remote_json(token):
+    if not check_token(token):
+        abort(400, "no permission")
+
     _resp = talker.get_remote()
     if _resp == "Empty":
         return "Empty"
@@ -137,7 +157,7 @@ def get_remote_json():
 
 @application.route("/<token>/put/<filename>", methods=["POST"])
 def handle_with_uploaded(token, filename):
-    if token not in TOKENS:
+    if not check_token(token):
         abort(400, "no permission")
 
     if "/" in filename:
@@ -159,7 +179,7 @@ def handle_with_uploaded(token, filename):
 
 @application.route("/<token>/pdf_main")
 def pdf_main(token):
-    if token not in TOKENS:
+    if not check_token(token):
         abort(400, "no permission")
 
     return redirect(talker.adr + "/get_pdf_main")
@@ -167,7 +187,7 @@ def pdf_main(token):
 
 @application.route("/<token>/pdf_remote")
 def pdf_remote(token):
-    if token not in TOKENS:
+    if not check_token(token):
         abort(400, "no permission")
 
     return redirect(talker.adr + "/get_pdf_remote")
