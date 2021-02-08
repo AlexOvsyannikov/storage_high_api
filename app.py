@@ -156,7 +156,21 @@ def handle_with_uploaded(token, filename):
 
     return json.dumps(_resp)
 
-# @application.route("/<token>/pdf_main"):
+
+@application.route("/<token>/pdf_main")
+def pdf_main(token):
+    if token not in TOKENS:
+        abort(400, "no permission")
+
+    return redirect(talker.adr + "/get_pdf_main")
+
+
+@application.route("/<token>/pdf_remote")
+def pdf_remote(token):
+    if token not in TOKENS:
+        abort(400, "no permission")
+
+    return redirect(talker.adr + "/get_pdf_remote")
 
 
 if __name__ == '__main__':
