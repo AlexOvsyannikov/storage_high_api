@@ -1,12 +1,15 @@
 import json
+import os
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, abort
 
 from talk_to_back import BackendTalker
 
 application = Flask(__name__)
 
 talker = BackendTalker(port=3000, host="192.168.0.109")
+
+TOKENS = ['123']
 
 
 @application.route('/')
@@ -16,7 +19,7 @@ def hello_world():
 
 @application.route('/get_scheme')
 def ret_csheme():
-    return redirect(talker.adr+"/get_storage_scheme")
+    return redirect(talker.adr + "/get_storage_scheme")
 
 
 @application.route('/get_list_of_items_main_json')
@@ -45,11 +48,12 @@ def ret_all_storage():
 
     return json.dumps(_)
 
+
 @application.route("/get_cell_json")
 def get_cell():
     cell_name = request.args.getlist("cell_name")[0]
     i = talker.get_cell(cell_name)
-    if i!="Неправильная ячейка":
+    if i != "Неправильная ячейка":
         _ = {
             "name": i.name,
             "merged": 0 if i.merged else 1,
@@ -66,17 +70,18 @@ def get_cell():
                 "depth": i.contained_item.original_depth,
                 "mass": i.contained_item.mass,
                 "uuid": i.contained_item.uuid
-        }}
+            }}
     else:
         _ = "Неправильная ячейка"
     return json.dumps(_)
+
 
 @application.route("/get_data_from_uuid_json")
 def get_data_from_uuid_json():
     uuid = request.args.getlist("uuid")[0]
 
     i = talker.get_data_to_search_by_item(uuid)
-    if i!="Неправильный uuid":
+    if i != "Неправильный uuid":
         _ = {
             "name": i.name,
             "merged": 0 if i.merged else 1,
@@ -99,6 +104,7 @@ def get_data_from_uuid_json():
 
     return json.dumps(_)
 
+
 @application.route("/get_item_from_storage_json")
 def get_item_from_storage_json():
     try:
@@ -108,23 +114,46 @@ def get_item_from_storage_json():
     _resp = talker.get(data_about_position)
     return _resp
 
+
 @application.route("/get_remote_json")
 def get_remote_json():
     _resp = talker.get_remote()
-    if _resp=="Empty":
+    if _resp == "Empty":
         return "Empty"
     _ = []
     for i in _resp:
         _.append({
-                "name": i.name,
-                "height": i.original_height,
-                "width": i.original_width,
-                "depth": i.original_depth,
-                "mass": i.mass,
-                "uuid": i.uuid
+            "name": i.name,
+            "height": i.original_height,
+            "width": i.original_width,
+            "depth": i.original_depth,
+            "mass": i.mass,
+            "uuid": i.uuid
         })
-
     return json.dumps(_)
+
+
+@application.route("/<token>/put/<filename>", methods=["POST"])
+def handle_with_uploaded(token, filename):
+    if token not in TOKENS:
+        abort(400, "no permission")
+
+    if "/" in filename:
+        # Return 400 BAD REQUEST
+        abort(400, "no subdirectories allowed")
+
+    directory = os.getcwdb().decode() + f"/static/uploads/{token}"
+
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    with open(f"{directory}/{filename}", "wb") as f:
+        f.write(request.data)
+
+    _resp = talker.put(request.data)
+
+    return json.dumps(_resp)
+
 
 if __name__ == '__main__':
     application.run()

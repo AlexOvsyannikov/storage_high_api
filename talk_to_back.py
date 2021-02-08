@@ -53,7 +53,7 @@ class BackendTalker:
     def put(self, xls_file):
         based = base64.b64encode(xls_file)
         resp = requests.post(self.adr + "/put_items_to_storage", data=based)
-        return resp
+        return resp.text
 
     def get_remote(self):
         resp = requests.get(self.adr+"/get_remote_pickle")
