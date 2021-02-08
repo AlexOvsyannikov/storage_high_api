@@ -56,14 +56,15 @@ class BackendTalker:
         return resp
 
     def get_remote(self):
-        resp = requests.get(self.adr+"/remote")
-        data_splitted = resp.text.split("<p>")
-        data_splitted.pop(0)
-        text = "".join(data_splitted)
-        data_splitted = text.split("</p>")
-        data_splitted.pop(-1)
-        text = "".join(data_splitted).replace("<br/>", "\n").replace("                ", " ").replace("            ", " ")
-        return text
+        resp = requests.get(self.adr+"/get_remote_pickle")
+        unbased = base64.b64decode(resp.text.encode())
+        try:
+            if unbased.decode()!="":
+                return pickle.loads(unbased)
+            else:
+                return "Empty"
+        except:
+            return pickle.loads(unbased)
 
     def get_main_pdf(self):
         resp = requests.get(self.adr+"/get_pdf_main")

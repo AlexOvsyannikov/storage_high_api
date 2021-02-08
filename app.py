@@ -108,5 +108,21 @@ def get_item_from_storage_json():
     _resp = talker.get(data_about_position)
     return _resp
 
+@application.route("/get_remote_json")
+def get_remote_json():
+    _resp = talker.get_remote()
+    _ = []
+    for i in _resp:
+        _.append({
+                "name": i.name,
+                "height": i.original_height,
+                "width": i.original_width,
+                "depth": i.original_depth,
+                "mass": i.mass,
+                "uuid": i.uuid
+        })
+
+    return json.dumps(_)
+
 if __name__ == '__main__':
     application.run()
