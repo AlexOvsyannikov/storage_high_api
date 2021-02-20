@@ -21,6 +21,13 @@ def check_token(token):
 def hello_world():
     return "HighLevelAPI made by ПиФла"
 
+@application.route('/auth', methods=["POST"])
+def auth():
+    pass
+
+@application.route("/reg", methods=["POST"])
+def reg():
+    pass
 
 @application.route('/<token>/get_scheme')
 def ret_scheme(token):
@@ -174,6 +181,8 @@ def handle_with_uploaded(token, filename):
 
     _resp = talker.put(request.data)
 
+    #TODO: сохранение pdf отчетов на сервере
+
     return json.dumps(_resp)
 
 
@@ -194,4 +203,4 @@ def pdf_remote(token):
 
 
 if __name__ == '__main__':
-    application.run()
+    application.run(host="192.168.0.109", port=7000)
