@@ -7,7 +7,7 @@ from talk_to_back import BackendTalker
 
 application = Flask(__name__)
 
-talker = BackendTalker(port=3000, host="192.168.0.109")
+talker = BackendTalker(port=7001, host="192.168.0.109")
 
 TOKENS = ['123']
 
@@ -203,4 +203,4 @@ def pdf_remote(token):
 
 
 if __name__ == '__main__':
-    application.run(host="192.168.0.109", port=7000)
+    application.run(host="192.168.0.109", port=7002)
